@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   StyleSheet,
   ImageBackground,
@@ -7,54 +8,93 @@ import {
   Image,
   Pressable,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 
 export function RegistrationScreen() {
+  const [name, setName] = useState("");
+  const [mail, setMail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const clearInputs = () => {
+    setName("");
+    setMail("");
+    setPassword("");
+  };
+
+  const onRegister = () => {
+    console.debug({ name, mail, password });
+    clearInputs();
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require("./images/photo-bg.jpg")}
-        style={styles.backgroundImage}
-      >
-        <KeyboardAvoidingView
-          style={styles.keyboardAvoidingContainer}
-          behavior="height"
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <ImageBackground
+          source={require("./images/photo-bg.jpg")}
+          style={styles.backgroundImage}
         >
-          <View style={styles.topContentContainer}>
-            <View style={styles.avatarContainer}>
-              <Pressable style={styles.addButton}>
-                <Image source={require("./images/add.png")} />
-              </Pressable>
+          <KeyboardAvoidingView
+            style={styles.keyboardAvoidingContainer}
+            behavior="height"
+          >
+            <View style={styles.topContentContainer}>
+              <View style={styles.avatarContainer}>
+                <Pressable style={styles.addButton}>
+                  <Image source={require("./images/add.png")} />
+                </Pressable>
+              </View>
+              <Text style={styles.title}>Реєстрація</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Логін"
+                value={name}
+                onChangeText={setName}
+              />
+              <TextInput
+                style={[styles.input, styles.secondaryInput]}
+                placeholder="Адреса електронної пошти"
+                value={mail}
+                onChangeText={setMail}
+              />
+              <View style={styles.passwordInputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Пароль"
+                  secureTextEntry={!showPassword}
+                  value={password}
+                  onChangeText={setPassword}
+                />
+                <Pressable onPress={toggleShowPassword}>
+                  <Text style={styles.showPasswordButton}>
+                    {showPassword ? "Приховати" : "Показати"}
+                  </Text>
+                </Pressable>
+              </View>
             </View>
-            <Text style={styles.title}>Реєстрація</Text>
-            <TextInput style={styles.input} placeholder="Логін" />
-            <TextInput
-              style={[styles.input, styles.secondaryInput]}
-              placeholder="Адреса електронної пошти"
-            />
-            <View style={styles.passwordInputContainer}>
-              <TextInput style={styles.input} placeholder="Пароль" />
-              <Pressable>
-                <Text style={styles.showPasswordButton}>Показати</Text>
-              </Pressable>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-        <View style={styles.bottomContentContainer}>
-          <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Зареєстуватися</Text>
-          </Pressable>
-          <View style={styles.link}>
-            <Text style={styles.textLink}>Вже є акаунт? </Text>
-            <Pressable>
-              <Text style={[styles.underlineText, styles.textLink]}>
-                Увійти
-              </Text>
+          </KeyboardAvoidingView>
+          <View style={styles.bottomContentContainer}>
+            <Pressable style={styles.button} onPress={onRegister}>
+              <Text style={styles.buttonText}>Зареєстуватися</Text>
             </Pressable>
+            <View style={styles.link}>
+              <Text style={styles.textLink}>Вже є акаунт? </Text>
+              <Pressable>
+                <Text style={[styles.underlineText, styles.textLink]}>
+                  Увійти
+                </Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-      </ImageBackground>
-    </View>
+        </ImageBackground>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 

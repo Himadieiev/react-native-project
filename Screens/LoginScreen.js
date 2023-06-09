@@ -1,54 +1,86 @@
+import { useState } from "react";
 import {
   StyleSheet,
   ImageBackground,
   Text,
   TextInput,
   View,
-  Image,
   Pressable,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 
 export function LoginScreen() {
+  const [mail, setMail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const clearInputs = () => {
+    setMail("");
+    setPassword("");
+  };
+
+  const onLogin = () => {
+    console.debug({ mail, password });
+    clearInputs();
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
+
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={require("./images/photo-bg.jpg")}
-        style={styles.backgroundImage}
-      >
-        <KeyboardAvoidingView
-          style={styles.keyboardAvoidingContainer}
-          behavior="height"
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <ImageBackground
+          source={require("./images/photo-bg.jpg")}
+          style={styles.backgroundImage}
         >
-          <View style={styles.topContentContainer}>
-            <Text style={styles.title}>Увійти</Text>
-            <TextInput
-              style={[styles.input, styles.firstInput]}
-              placeholder="Адреса електронної пошти"
-            />
-            <View style={styles.passwordInputContainer}>
-              <TextInput style={styles.input} placeholder="Пароль" />
+          <KeyboardAvoidingView
+            style={styles.keyboardAvoidingContainer}
+            behavior="height"
+          >
+            <View style={styles.topContentContainer}>
+              <Text style={styles.title}>Увійти</Text>
+              <TextInput
+                style={[styles.input, styles.firstInput]}
+                placeholder="Адреса електронної пошти"
+                value={mail}
+                onChangeText={setMail}
+              />
+              <View style={styles.passwordInputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Пароль"
+                  secureTextEntry={!showPassword}
+                  value={password}
+                  onChangeText={setPassword}
+                />
+                <Pressable onPress={toggleShowPassword}>
+                  <Text style={styles.showPasswordButton}>
+                    {showPassword ? "Приховати" : "Показати"}
+                  </Text>
+                </Pressable>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+          <View style={styles.bottomContentContainer}>
+            <Pressable style={styles.button} onPress={onLogin}>
+              <Text style={styles.buttonText}>Увійти</Text>
+            </Pressable>
+            <View style={styles.link}>
+              <Text style={styles.textLink}>Немає акаунту? </Text>
               <Pressable>
-                <Text style={styles.showPasswordButton}>Показати</Text>
+                <Text style={[styles.underlineText, styles.textLink]}>
+                  Зареєструватися
+                </Text>
               </Pressable>
             </View>
           </View>
-        </KeyboardAvoidingView>
-        <View style={styles.bottomContentContainer}>
-          <Pressable style={styles.button}>
-            <Text style={styles.buttonText}>Увійти</Text>
-          </Pressable>
-          <View style={styles.link}>
-            <Text style={styles.textLink}>Немає акаунту? </Text>
-            <Pressable>
-              <Text style={[styles.underlineText, styles.textLink]}>
-                Зареєструватися
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      </ImageBackground>
-    </View>
+        </ImageBackground>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
