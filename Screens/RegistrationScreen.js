@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import {
   StyleSheet,
@@ -18,6 +19,8 @@ export function RegistrationScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const navigation = useNavigation();
+
   const clearInputs = () => {
     setName("");
     setMail("");
@@ -27,6 +30,7 @@ export function RegistrationScreen() {
   const onRegister = () => {
     console.debug({ name, mail, password });
     clearInputs();
+    navigation.navigate("PostsScreen");
   };
 
   const toggleShowPassword = () => {
@@ -85,7 +89,7 @@ export function RegistrationScreen() {
             </Pressable>
             <View style={styles.link}>
               <Text style={styles.textLink}>Вже є акаунт? </Text>
-              <Pressable>
+              <Pressable onPress={() => navigation.navigate("LoginScreen")}>
                 <Text style={[styles.underlineText, styles.textLink]}>
                   Увійти
                 </Text>
@@ -154,7 +158,6 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     height: 51,
-    paddingVertical: 16,
     backgroundColor: "#FF6C00",
     borderRadius: 100,
     justifyContent: "center",
