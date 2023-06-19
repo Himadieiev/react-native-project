@@ -18,6 +18,8 @@ export function RegistrationScreen() {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isFieldsEmpty, setIsFieldsEmpty] = useState(true);
+  const [isEmailValid, setIsEmailValid] = useState(true);
 
   const navigation = useNavigation();
 
@@ -27,10 +29,23 @@ export function RegistrationScreen() {
     setPassword("");
   };
 
+  const checkFieldsEmpty = () => {
+    if (name.trim() === "" || mail.trim() === "" || password.trim() === "") {
+      setIsFieldsEmpty(true);
+    } else {
+      setIsFieldsEmpty(false);
+    }
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /\S+@\S+\.\S+/;
+    setIsEmailValid(emailRegex.test(email));
+  };
+
   const onRegister = () => {
     console.debug({ name, mail, password });
     clearInputs();
-    navigation.navigate("PostsScreen");
+    navigation.navigate("Home");
   };
 
   const toggleShowPassword = () => {
@@ -60,12 +75,17 @@ export function RegistrationScreen() {
                 placeholder="Логін"
                 value={name}
                 onChangeText={setName}
+                onBlur={checkFieldsEmpty}
               />
               <TextInput
                 style={[styles.input, styles.secondaryInput]}
                 placeholder="Адреса електронної пошти"
                 value={mail}
-                onChangeText={setMail}
+                onChangeText={(text) => {
+                  setMail(text);
+                  validateEmail(text);
+                }}
+                onBlur={checkFieldsEmpty}
               />
               <View style={styles.passwordInputContainer}>
                 <TextInput
@@ -74,6 +94,7 @@ export function RegistrationScreen() {
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={setPassword}
+                  onBlur={checkFieldsEmpty}
                 />
                 <Pressable onPress={toggleShowPassword}>
                   <Text style={styles.showPasswordButton}>
@@ -84,7 +105,14 @@ export function RegistrationScreen() {
             </View>
           </KeyboardAvoidingView>
           <View style={styles.bottomContentContainer}>
-            <Pressable style={styles.button} onPress={onRegister}>
+            <Pressable
+              style={[
+                styles.button,
+                isFieldsEmpty || !isEmailValid ? styles.disabledButton : null,
+              ]}
+              onPress={onRegister}
+              disabled={isFieldsEmpty || !isEmailValid}
+            >
               <Text style={styles.buttonText}>Зареєстуватися</Text>
             </Pressable>
             <View style={styles.link}>
@@ -163,6 +191,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
+  disabledButton: {
+    opacity: 0.5,
+  },
+
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,

@@ -16,6 +16,8 @@ export function LoginScreen() {
   const [mail, setMail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isFieldsEmpty, setIsFieldsEmpty] = useState(true);
+  const [isEmailValid, setIsEmailValid] = useState(true);
 
   const navigation = useNavigation();
 
@@ -24,11 +26,24 @@ export function LoginScreen() {
     setPassword("");
   };
 
+  const checkFieldsEmpty = () => {
+    if (mail.trim() === "" || password.trim() === "") {
+      setIsFieldsEmpty(true);
+    } else {
+      setIsFieldsEmpty(false);
+    }
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /\S+@\S+\.\S+/;
+    setIsEmailValid(emailRegex.test(email));
+  };
+
   const onLogin = () => {
     console.debug({ mail, password });
     clearInputs();
 
-    navigation.navigate("PostsScreen");
+    navigation.navigate("Home");
   };
 
   const toggleShowPassword = () => {
@@ -52,7 +67,11 @@ export function LoginScreen() {
                 style={[styles.input, styles.firstInput]}
                 placeholder="Адреса електронної пошти"
                 value={mail}
-                onChangeText={setMail}
+                onChangeText={(text) => {
+                  setMail(text);
+                  validateEmail(text);
+                }}
+                onBlur={checkFieldsEmpty}
               />
               <View style={styles.passwordInputContainer}>
                 <TextInput
@@ -61,6 +80,7 @@ export function LoginScreen() {
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={setPassword}
+                  onBlur={checkFieldsEmpty}
                 />
                 <Pressable onPress={toggleShowPassword}>
                   <Text style={styles.showPasswordButton}>
@@ -71,7 +91,14 @@ export function LoginScreen() {
             </View>
           </KeyboardAvoidingView>
           <View style={styles.bottomContentContainer}>
-            <Pressable style={styles.button} onPress={onLogin}>
+            <Pressable
+              style={[
+                styles.button,
+                isFieldsEmpty || !isEmailValid ? styles.disabledButton : null,
+              ]}
+              onPress={onLogin}
+              disabled={isFieldsEmpty || !isEmailValid}
+            >
               <Text style={styles.buttonText}>Увійти</Text>
             </Pressable>
             <View style={styles.link}>
@@ -149,6 +176,9 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     justifyContent: "center",
     alignItems: "center",
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   buttonText: {
     color: "#FFFFFF",
