@@ -6,12 +6,9 @@ import {
   StyleSheet,
   Pressable,
   TouchableOpacity,
-<<<<<<< HEAD
   TextInput,
   Keyboard,
   TouchableWithoutFeedback,
-=======
->>>>>>> 8e397ddb1bfa17506d0de428dc1173837ee92c26
 } from "react-native";
 import { MaterialIcons, SimpleLineIcons, Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -24,12 +21,9 @@ export function CreatePostsScreen() {
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [uriPhoto, setUriPhoto] = useState(null);
-<<<<<<< HEAD
   const [namePhoto, setNamePhoto] = useState("");
   const [nameLocation, setNameLocation] = useState("");
   const [isFieldsEmpty, setIsFieldsEmpty] = useState(true);
-=======
->>>>>>> 8e397ddb1bfa17506d0de428dc1173837ee92c26
 
   useEffect(() => {
     (async () => {
@@ -80,7 +74,6 @@ export function CreatePostsScreen() {
   };
 
   return (
-<<<<<<< HEAD
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <View style={styles.header}>
@@ -92,61 +85,8 @@ export function CreatePostsScreen() {
             />
           </Pressable>
           <Text style={styles.title}>Створити публікацію</Text>
-=======
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Pressable style={styles.logOutButton} onPress={back}>
-          <MaterialIcons name="keyboard-backspace" size={24} color="#212121" />
-        </Pressable>
-        <Text style={styles.title}>Створити публікацію</Text>
-      </View>
-      <View style={styles.mainContent}>
-        <View style={styles.photoContainer}>
-          <Camera style={styles.camera} type={type} ref={setCameraRef}>
-            {uriPhoto && (
-              <View style={styles.takePhotoContainer}>
-                <Image source={{ uri: uriPhoto }} style={styles.photo} />
-              </View>
-            )}
-
-            <View style={styles.photoView}>
-              <TouchableOpacity
-                style={styles.flipContainer}
-                onPress={() => {
-                  setType(
-                    type === Camera.Constants.Type.back
-                      ? Camera.Constants.Type.front
-                      : Camera.Constants.Type.back
-                  );
-                }}
-              >
-                <Text style={{ fontSize: 12, color: "white" }}> Flip </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={
-                  hasPermission
-                    ? styles.cameraContainerActive
-                    : styles.cameraContainer
-                }
-                onPress={async () => {
-                  if (cameraRef) {
-                    const { uri } = await cameraRef.takePictureAsync();
-                    await MediaLibrary.createAssetAsync(uri);
-                    console.log(uri);
-                    setUriPhoto(uri);
-                  }
-                }}
-              >
-                <MaterialIcons name="photo-camera" size={20} color="#BDBDBD" />
-                <View style={styles.takePhotoOut}>
-                  <View style={styles.takePhotoInner}></View>
-                </View>
-              </TouchableOpacity>
-            </View>
-          </Camera>
->>>>>>> 8e397ddb1bfa17506d0de428dc1173837ee92c26
         </View>
+
         <View style={styles.mainContent}>
           <View style={styles.photoContainer}>
             {uriPhoto ? (
