@@ -1,10 +1,39 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
 import { MaterialIcons, SimpleLineIcons, Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { Camera } from "expo-camera";
+import * as MediaLibrary from "expo-media-library";
 
 export function CreatePostsScreen() {
   const navigation = useNavigation();
+  const [hasPermission, setHasPermission] = useState(null);
+  const [cameraRef, setCameraRef] = useState(null);
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [uriPhoto, setUriPhoto] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      await MediaLibrary.requestPermissionsAsync();
+
+      setHasPermission(status === "granted");
+    })();
+  }, []);
+
+  if (hasPermission === null) {
+    return <View />;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
 
   const back = () => {
     navigation.navigate("PostsScreen");
@@ -15,7 +44,7 @@ export function CreatePostsScreen() {
   };
 
   const onDeletePost = () => {
-    console.debug("You have successfully deleted the post");
+    setUriPhoto(null);
   };
 
   return (
@@ -28,9 +57,49 @@ export function CreatePostsScreen() {
       </View>
       <View style={styles.mainContent}>
         <View style={styles.photoContainer}>
-          <View style={styles.cameraContainer}>
-            <MaterialIcons name="photo-camera" size={20} color="#BDBDBD" />
-          </View>
+          <Camera style={styles.camera} type={type} ref={setCameraRef}>
+            {uriPhoto && (
+              <View style={styles.takePhotoContainer}>
+                <Image source={{ uri: uriPhoto }} style={styles.photo} />
+              </View>
+            )}
+
+            <View style={styles.photoView}>
+              <TouchableOpacity
+                style={styles.flipContainer}
+                onPress={() => {
+                  setType(
+                    type === Camera.Constants.Type.back
+                      ? Camera.Constants.Type.front
+                      : Camera.Constants.Type.back
+                  );
+                }}
+              >
+                <Text style={{ fontSize: 12, color: "white" }}> Flip </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={
+                  hasPermission
+                    ? styles.cameraContainerActive
+                    : styles.cameraContainer
+                }
+                onPress={async () => {
+                  if (cameraRef) {
+                    const { uri } = await cameraRef.takePictureAsync();
+                    await MediaLibrary.createAssetAsync(uri);
+                    console.log(uri);
+                    setUriPhoto(uri);
+                  }
+                }}
+              >
+                <MaterialIcons name="photo-camera" size={20} color="#BDBDBD" />
+                <View style={styles.takePhotoOut}>
+                  <View style={styles.takePhotoInner}></View>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </Camera>
         </View>
         <Text style={styles.uploadPhoto}>Завантажте фото</Text>
         <View style={styles.infoPhotoContainer}>
@@ -94,6 +163,8 @@ const styles = StyleSheet.create({
     borderColor: "#E8E8E8",
     borderWidth: 1,
     borderRadius: 8,
+    overflow: "hidden",
+    position: "relative",
   },
 
   cameraContainer: {
@@ -102,6 +173,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
+    borderRadius: 30,
+  },
+
+  cameraContainerActive: {
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
     borderRadius: 30,
   },
 
@@ -169,5 +249,32 @@ const styles = StyleSheet.create({
     marginTop: 80,
     marginLeft: "auto",
     marginRight: "auto",
+  },
+  camera: {
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  flipContainer: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+  },
+  photoView: {
+    backgroundColor: "transparent",
+    width: "100%",
+    height: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  takePhotoContainer: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+  },
+  photo: {
+    width: "100%",
+    height: "100%",
   },
 });

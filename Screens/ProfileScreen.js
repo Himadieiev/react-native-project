@@ -60,7 +60,9 @@ export function ProfileScreen() {
                   size={15}
                   color="#BDBDBD"
                 />
-                <Text style={styles.location}>Ukraine</Text>
+                <Pressable onPress={() => navigation.navigate("MapScreen")}>
+                  <Text style={styles.location}>Ukraine</Text>
+                </Pressable>
               </View>
             </View>
             <View style={styles.photoContainer}>
@@ -85,7 +87,9 @@ export function ProfileScreen() {
                   size={15}
                   color="#BDBDBD"
                 />
-                <Text style={styles.location}>Ukraine</Text>
+                <Pressable onPress={() => navigation.navigate("MapScreen")}>
+                  <Text style={styles.location}>Ukraine</Text>
+                </Pressable>
               </View>
             </View>
             <View style={styles.photoContainer}>
@@ -110,7 +114,9 @@ export function ProfileScreen() {
                   size={15}
                   color="#BDBDBD"
                 />
-                <Text style={styles.location}>Italy</Text>
+                <Pressable onPress={() => navigation.navigate("MapScreen")}>
+                  <Text style={styles.location}>Italy</Text>
+                </Pressable>
               </View>
             </View>
           </ScrollView>

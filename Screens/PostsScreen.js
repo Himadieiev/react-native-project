@@ -43,6 +43,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     height: 88,
     paddingTop: 54,
+    paddingLeft: 16,
+    paddingRight: 16,
     borderBottomWidth: 0.5,
     borderBottomColor: " #E5E5E5",
   },
@@ -50,8 +52,8 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Roboto-Medium",
     fontSize: 17,
-    marginLeft: 155,
-    marginRight: 109,
+    marginLeft: 140,
+    marginRight: "auto",
   },
 
   content: {
