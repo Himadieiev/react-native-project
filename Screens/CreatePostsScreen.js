@@ -25,7 +25,6 @@ export function CreatePostsScreen() {
   const [namePhoto, setNamePhoto] = useState("");
   const [nameLocation, setNameLocation] = useState("");
   const [isFieldsEmpty, setIsFieldsEmpty] = useState(true);
-  const [location, setLocation] = useState();
 
   useEffect(() => {
     (async () => {
@@ -69,31 +68,25 @@ export function CreatePostsScreen() {
   };
 
   const onCreatePost = async () => {
-    console.debug({ namePhoto, nameLocation, location });
-    clearInputs();
-
+    let currentLocation = null;
     try {
       const { coords } = await Location.getCurrentPositionAsync();
       const { latitude, longitude } = coords;
 
-      setLocation({ latitude, longitude });
+      currentLocation = { latitude, longitude };
     } catch (error) {
       console.log("Помилка під час отримання місцезнаходження:", error);
-    }
-
-    if (cameraRef) {
-      const { uri } = await cameraRef.takePictureAsync();
-      await MediaLibrary.createAssetAsync(uri);
-      console.log(uri);
-      setUriPhoto(uri);
     }
 
     navigation.navigate("PostsScreen", {
       uriPhoto,
       namePhoto,
       nameLocation,
-      location,
+      currentLocation,
     });
+
+    clearInputs();
+    setUriPhoto(null);
   };
   const onDeletePost = () => {
     setUriPhoto(null);
@@ -176,15 +169,16 @@ export function CreatePostsScreen() {
             onBlur={checkFieldsEmpty}
           />
           <View style={styles.line}></View>
-          <TextInput
-            style={styles.locationPhotoName}
-            placeholder="Місцевість..."
-            value={nameLocation}
-            onChangeText={setNameLocation}
-            onBlur={checkFieldsEmpty}
-          />
-          {/* <SimpleLineIcons name="location-pin" size={15} color="#BDBDBD" /> */}
-
+          <View style={styles.locationInputContainer}>
+            <SimpleLineIcons name="location-pin" size={15} color="#BDBDBD" />
+            <TextInput
+              style={styles.locationPhotoName}
+              placeholder="Місцевість..."
+              value={nameLocation}
+              onChangeText={setNameLocation}
+              onBlur={checkFieldsEmpty}
+            />
+          </View>
           <View style={styles.line}></View>
           <Pressable
             style={
@@ -203,8 +197,19 @@ export function CreatePostsScreen() {
               Опубліковати
             </Text>
           </Pressable>
-          <Pressable style={styles.buttonDeletePost} onPress={onDeletePost}>
-            <Feather name="trash-2" size={24} color="#DADADA" />
+          <Pressable
+            style={
+              !uriPhoto
+                ? styles.disabledbuttonDeletePost
+                : styles.buttonDeletePost
+            }
+            onPress={onDeletePost}
+          >
+            {!uriPhoto ? (
+              <Feather name="trash-2" size={24} color="#DADADA" />
+            ) : (
+              <Feather name="trash-2" size={24} color="#FFFFFF" />
+            )}
           </Pressable>
         </View>
       </View>
@@ -283,7 +288,7 @@ const styles = StyleSheet.create({
   },
 
   namePhoto: {
-    fontFamily: "Roboto-Medium",
+    fontFamily: "Roboto-Regular",
     fontSize: 16,
     color: "#212121",
     marginTop: 32,
@@ -302,6 +307,8 @@ const styles = StyleSheet.create({
     color: "#212121",
     marginTop: 16,
     marginBottom: 10,
+    width: "100%",
+    marginLeft: 4,
   },
 
   buttonCreatePost: {
@@ -340,6 +347,19 @@ const styles = StyleSheet.create({
     width: 70,
     height: 40,
     paddingHorizontal: 23,
+    backgroundColor: "#FF6C00",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 80,
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+
+  disabledbuttonDeletePost: {
+    width: 70,
+    height: 40,
+    paddingHorizontal: 23,
     backgroundColor: "#F6F6F6",
     borderRadius: 20,
     justifyContent: "center",
@@ -374,5 +394,10 @@ const styles = StyleSheet.create({
   photo: {
     width: "100%",
     height: "100%",
+  },
+  locationInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
   },
 });

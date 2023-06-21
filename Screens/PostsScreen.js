@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { ScrollView } from "react-native-gesture-handler";
 
 export function PostsScreen() {
   const navigation = useNavigation();
@@ -10,7 +11,22 @@ export function PostsScreen() {
   const uriPhoto = route.params?.uriPhoto || null;
   const namePhoto = route.params?.namePhoto || null;
   const nameLocation = route.params?.nameLocation || null;
-  const location = route.params?.location || null;
+  const currentLocation = route.params?.currentLocation || null;
+  const [postList, setPostList] = useState([]);
+
+  useEffect(() => {
+    if (uriPhoto) {
+      const newPost = {
+        uriPhoto,
+        namePhoto,
+        nameLocation,
+        currentLocation,
+      };
+      setPostList((prevPostList) => [...prevPostList, newPost]);
+    }
+  }, [uriPhoto]);
+
+  console.log(postList);
 
   onLogout = () => {
     navigation.navigate("LoginScreen");
@@ -35,32 +51,45 @@ export function PostsScreen() {
         </View>
       </View>
       {uriPhoto && (
-        <View style={styles.postsContainer}>
-          <View style={styles.post}>
-            <Image source={{ uri: uriPhoto }} style={styles.photo} />
-          </View>
-          <Text style={styles.namePhoto}>{namePhoto}</Text>
-          <View style={styles.commentsContainer}>
-            <View style={styles.commentsPhoto}>
-              <Pressable onPress={() => navigation.navigate("CommentsScreen")}>
-                <Image source={require("./images/message-circle-empty.png")} />
-              </Pressable>
+        <ScrollView>
+          {postList.map((post, index) => (
+            <View key={index} style={styles.postContainer}>
+              <View style={styles.post}>
+                <Image source={{ uri: post.uriPhoto }} style={styles.photo} />
+              </View>
+              <Text style={styles.namePhoto}>{post.namePhoto}</Text>
+              <View style={styles.commentsContainer}>
+                <View style={styles.commentsPhoto}>
+                  <Pressable
+                    onPress={() => navigation.navigate("CommentsScreen")}
+                  >
+                    <Image
+                      source={require("./images/message-circle-empty.png")}
+                    />
+                  </Pressable>
 
-              <Text style={styles.commentNumber}>0</Text>
+                  <Text style={styles.commentNumber}>0</Text>
+                </View>
+                <View style={styles.locationPhoto}>
+                  <SimpleLineIcons
+                    name="location-pin"
+                    size={15}
+                    color="#BDBDBD"
+                  />
+                  <Pressable
+                    onPress={() => {
+                      navigation.navigate("MapScreen", {
+                        locationPhoto: post.currentLocation,
+                      });
+                    }}
+                  >
+                    <Text style={styles.location}>{post.nameLocation}</Text>
+                  </Pressable>
+                </View>
+              </View>
             </View>
-            <View style={styles.locationPhoto}>
-              <SimpleLineIcons name="location-pin" size={15} color="#BDBDBD" />
-              <Pressable
-                onPress={() => {
-                  navigation.navigate("MapScreen", { locationPhoto: location });
-                  console.log(location);
-                }}
-              >
-                <Text style={styles.location}>{nameLocation}</Text>
-              </Pressable>
-            </View>
-          </View>
-        </View>
+          ))}
+        </ScrollView>
       )}
     </View>
   );
@@ -94,6 +123,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 32,
     marginLeft: 16,
+    marginBottom: 32,
   },
 
   avatar: {
@@ -118,7 +148,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     marginLeft: "auto",
     marginRight: "auto",
-    marginTop: 32,
     justifyContent: "center",
     alignItems: "center",
     borderStyle: "solid",
@@ -132,7 +161,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  postsContainer: {
+  postContainer: {
     paddingLeft: 16,
     paddingRight: 16,
   },
