@@ -14,6 +14,7 @@ import { MaterialIcons, SimpleLineIcons, Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
+import * as Location from "expo-location";
 
 export function CreatePostsScreen() {
   const navigation = useNavigation();
@@ -24,11 +25,20 @@ export function CreatePostsScreen() {
   const [namePhoto, setNamePhoto] = useState("");
   const [nameLocation, setNameLocation] = useState("");
   const [isFieldsEmpty, setIsFieldsEmpty] = useState(true);
+  const [location, setLocation] = useState();
 
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       await MediaLibrary.requestPermissionsAsync();
+
+      const locationPermission =
+        await Location.requestForegroundPermissionsAsync();
+
+      if (locationPermission.status !== "granted") {
+        console.log("Permission to access location was denied");
+        return;
+      }
 
       setHasPermission(status === "granted");
     })();
@@ -58,17 +68,33 @@ export function CreatePostsScreen() {
     }
   };
 
-  const onCreatePost = () => {
-    console.debug({ namePhoto, nameLocation });
+  const onCreatePost = async () => {
+    console.debug({ namePhoto, nameLocation, location });
     clearInputs();
+
+    try {
+      const { coords } = await Location.getCurrentPositionAsync();
+      const { latitude, longitude } = coords;
+
+      setLocation({ latitude, longitude });
+    } catch (error) {
+      console.log("Помилка під час отримання місцезнаходження:", error);
+    }
+
+    if (cameraRef) {
+      const { uri } = await cameraRef.takePictureAsync();
+      await MediaLibrary.createAssetAsync(uri);
+      console.log(uri);
+      setUriPhoto(uri);
+    }
 
     navigation.navigate("PostsScreen", {
       uriPhoto,
       namePhoto,
       nameLocation,
+      location,
     });
   };
-
   const onDeletePost = () => {
     setUriPhoto(null);
   };
@@ -77,7 +103,7 @@ export function CreatePostsScreen() {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Pressable style={styles.logOutButton} onPress={back}>
+          <Pressable onPress={back}>
             <MaterialIcons
               name="keyboard-backspace"
               size={24}

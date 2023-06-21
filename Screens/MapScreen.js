@@ -2,15 +2,25 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
+import { useRoute } from "@react-navigation/native";
 
 export function MapScreen() {
   const [location, setLocation] = useState(null);
+
+  const route = useRoute();
+
+  const locationPhoto = route.params?.locationPhoto || {
+    latitude: 50.4501,
+    longitude: 30.5234,
+  };
+
+  console.log(locationPhoto);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        console.log("Permission to access location was denied");
+        console.log("У доступі до місцезнаходження відмовлено");
       }
 
       let location = await Location.getCurrentPositionAsync({});
@@ -27,8 +37,8 @@ export function MapScreen() {
       <MapView
         style={styles.mapStyle}
         region={{
-          latitude: 50.4501,
-          longitude: 30.5234,
+          latitude: locationPhoto.latitude,
+          longitude: locationPhoto.longitude,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}

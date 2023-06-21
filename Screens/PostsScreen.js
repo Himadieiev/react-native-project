@@ -10,6 +10,7 @@ export function PostsScreen() {
   const uriPhoto = route.params?.uriPhoto || null;
   const namePhoto = route.params?.namePhoto || null;
   const nameLocation = route.params?.nameLocation || null;
+  const location = route.params?.location || null;
 
   onLogout = () => {
     navigation.navigate("LoginScreen");
@@ -41,12 +42,20 @@ export function PostsScreen() {
           <Text style={styles.namePhoto}>{namePhoto}</Text>
           <View style={styles.commentsContainer}>
             <View style={styles.commentsPhoto}>
-              <Image source={require("./images/message-circle-empty.png")} />
-              <Text style={styles.commentNumber}>8</Text>
+              <Pressable onPress={() => navigation.navigate("CommentsScreen")}>
+                <Image source={require("./images/message-circle-empty.png")} />
+              </Pressable>
+
+              <Text style={styles.commentNumber}>0</Text>
             </View>
             <View style={styles.locationPhoto}>
               <SimpleLineIcons name="location-pin" size={15} color="#BDBDBD" />
-              <Pressable onPress={() => navigation.navigate("MapScreen")}>
+              <Pressable
+                onPress={() => {
+                  navigation.navigate("MapScreen", { locationPhoto: location });
+                  console.log(location);
+                }}
+              >
                 <Text style={styles.location}>{nameLocation}</Text>
               </Pressable>
             </View>
