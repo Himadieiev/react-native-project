@@ -11,7 +11,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logInAuthThunk } from "../redux/Auth/thunks";
 import { setUser } from "../redux/Auth/authSlice";
 
@@ -23,8 +23,13 @@ export function LoginScreen() {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigation.navigate("Home");
+    }
+  }, [isLoggedIn, navigation]);
 
   const clearInputs = () => {
     setEmail("");
