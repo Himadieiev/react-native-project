@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   ImageBackground,
@@ -11,23 +11,28 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { logInAuthThunk } from "../redux/Auth/thunks";
+import { setUser } from "../redux/Auth/authSlice";
 
 export function LoginScreen() {
-  const [mail, setMail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isFieldsEmpty, setIsFieldsEmpty] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
-
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  useEffect(() => {}, []);
+
   const clearInputs = () => {
-    setMail("");
+    setEmail("");
     setPassword("");
   };
 
   const checkFieldsEmpty = () => {
-    if (mail.trim() === "" || password.trim() === "") {
+    if (email.trim() === "" || password.trim() === "") {
       setIsFieldsEmpty(true);
     } else {
       setIsFieldsEmpty(false);
@@ -40,10 +45,20 @@ export function LoginScreen() {
   };
 
   const onLogin = () => {
-    console.debug({ mail, password });
-    clearInputs();
+    dispatch(logInAuthThunk({ email, password }))
+      .then((response) => {
+        if (response.type !== "auth/login/fulfilled") {
+          alert("Вхід не виконано! Спробуйте ще раз або зареєструйтесь!");
+          return;
+        }
 
-    navigation.navigate("Home");
+        dispatch(setUser({ email }));
+        clearInputs();
+        navigation.navigate("Home");
+      })
+      .catch((error) => {
+        throw error;
+      });
   };
 
   const toggleShowPassword = () => {
@@ -66,9 +81,9 @@ export function LoginScreen() {
               <TextInput
                 style={[styles.input, styles.firstInput]}
                 placeholder="Адреса електронної пошти"
-                value={mail}
+                value={email}
                 onChangeText={(text) => {
-                  setMail(text);
+                  setEmail(text);
                   validateEmail(text);
                 }}
                 onBlur={checkFieldsEmpty}

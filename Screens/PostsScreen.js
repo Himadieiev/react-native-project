@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Pressable } from "react-native";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
+import { useDispatch, useSelector } from "react-redux";
+import { createPostThunk, getPostsThunk } from "../redux/Posts/thunks";
+import { logOutAuthThunk } from "../redux/Auth/thunks";
+import { clearUser } from "../redux/Auth/authSlice";
 
 export function PostsScreen() {
   const navigation = useNavigation();
@@ -12,7 +16,12 @@ export function PostsScreen() {
   const namePhoto = route.params?.namePhoto || null;
   const nameLocation = route.params?.nameLocation || null;
   const currentLocation = route.params?.currentLocation || null;
-  const [postList, setPostList] = useState([]);
+  const dispatch = useDispatch();
+  const { posts } = useSelector((state) => state.posts);
+
+  useEffect(() => {
+    dispatch(getPostsThunk());
+  }, []);
 
   useEffect(() => {
     if (uriPhoto) {
@@ -22,13 +31,28 @@ export function PostsScreen() {
         nameLocation,
         currentLocation,
       };
-      setPostList((prevPostList) => [...prevPostList, newPost]);
+      dispatch(createPostThunk(newPost));
     }
   }, [uriPhoto]);
 
-  console.log(postList);
+  // const onDeletePost = (postId) => {
+  //   dispatch(deletePostThunk(postId));
+  // };
+
+  // const deleteDocument = async (collectionName, documentId) => {
+  //   const docRef = doc(collection(db, collectionName), documentId);
+
+  //   try {
+  //     await deleteDoc(docRef);
+  //     console.log("їїї");
+  //   } catch (error) {
+  //     console.log("їїї", error);
+  //   }
+  // };
 
   onLogout = () => {
+    dispatch(logOutAuthThunk());
+    dispatch(clearUser());
     navigation.navigate("LoginScreen");
   };
 
@@ -50,9 +74,9 @@ export function PostsScreen() {
           <Text style={styles.emailUser}>email@example.com</Text>
         </View>
       </View>
-      {uriPhoto && (
+      {posts && (
         <ScrollView>
-          {postList.map((post, index) => (
+          {posts.map((post, index) => (
             <View key={index} style={styles.postContainer}>
               <View style={styles.post}>
                 <Image source={{ uri: post.uriPhoto }} style={styles.photo} />
@@ -61,7 +85,13 @@ export function PostsScreen() {
               <View style={styles.commentsContainer}>
                 <View style={styles.commentsPhoto}>
                   <Pressable
-                    onPress={() => navigation.navigate("CommentsScreen")}
+                    onPress={() =>
+                      navigation.navigate("CommentsScreen", {
+                        uriPhoto: post.uriPhoto,
+                        namePhoto: post.namePhoto,
+                        nameLocation: post.nameLocation,
+                      })
+                    }
                   >
                     <Image
                       source={require("./images/message-circle-empty.png")}

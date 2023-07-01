@@ -9,11 +9,24 @@ import {
 import { MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getPostsThunk } from "../redux/Posts/thunks";
+import { logOutAuthThunk } from "../redux/Auth/thunks";
+import { clearUser } from "../redux/Auth/authSlice";
 
 export function ProfileScreen() {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { posts } = useSelector((state) => state.posts);
+
+  useEffect(() => {
+    dispatch(getPostsThunk());
+  }, []);
 
   onLogout = () => {
+    dispatch(logOutAuthThunk());
+    dispatch(clearUser());
     navigation.navigate("LoginScreen");
   };
 
@@ -29,97 +42,65 @@ export function ProfileScreen() {
               source={require("./images/avatar.jpg")}
               style={styles.avatarImage}
             ></ImageBackground>
+            <Pressable style={styles.addButton}>
+              <Image source={require("./images/close.png")} />
+            </Pressable>
           </View>
           <Text style={styles.title}>Natali Romanova</Text>
-          <Pressable style={styles.addButton}>
-            <Image source={require("./images/close.png")} />
-          </Pressable>
+
           <Pressable style={styles.logOutButton} onPress={onLogout}>
             <MaterialIcons name="logout" size={24} color="#BDBDBD" />
           </Pressable>
-          <ScrollView>
-            <View style={styles.photoContainer}>
-              <ImageBackground
-                source={require("./images/rectangle-1.jpg")}
-                style={styles.avatarImage}
-              ></ImageBackground>
-            </View>
-            <Text style={styles.namePhoto}>Ліс</Text>
-            <View style={styles.photoDetailsContainer}>
-              <View style={styles.commentsPhoto}>
-                <Image source={require("./images/message-circle.png")} />
-                <Text style={styles.commentNumber}>8</Text>
-              </View>
-              <View style={styles.likesPhoto}>
-                <Image source={require("./images/thumbs-up.png")} />
-                <Text style={styles.likesNumber}>153</Text>
-              </View>
-              <View style={styles.locationPhoto}>
-                <SimpleLineIcons
-                  name="location-pin"
-                  size={15}
-                  color="#BDBDBD"
-                />
-                <Pressable onPress={() => navigation.navigate("MapScreen")}>
-                  <Text style={styles.location}>Ukraine</Text>
-                </Pressable>
-              </View>
-            </View>
-            <View style={styles.photoContainer}>
-              <ImageBackground
-                source={require("./images/rectangle-2.jpg")}
-                style={styles.avatarImage}
-              ></ImageBackground>
-            </View>
-            <Text style={styles.namePhoto}>Захід на Чорному морі</Text>
-            <View style={styles.photoDetailsContainer}>
-              <View style={styles.commentsPhoto}>
-                <Image source={require("./images/message-circle.png")} />
-                <Text style={styles.commentNumber}>3</Text>
-              </View>
-              <View style={styles.likesPhoto}>
-                <Image source={require("./images/thumbs-up.png")} />
-                <Text style={styles.likesNumber}>200</Text>
-              </View>
-              <View style={styles.locationPhoto}>
-                <SimpleLineIcons
-                  name="location-pin"
-                  size={15}
-                  color="#BDBDBD"
-                />
-                <Pressable onPress={() => navigation.navigate("MapScreen")}>
-                  <Text style={styles.location}>Ukraine</Text>
-                </Pressable>
-              </View>
-            </View>
-            <View style={styles.photoContainer}>
-              <ImageBackground
-                source={require("./images/rectangle-3.jpg")}
-                style={styles.avatarImage}
-              ></ImageBackground>
-            </View>
-            <Text style={styles.namePhoto}>Старий будиночок у Венеції</Text>
-            <View style={styles.photoDetailsContainer}>
-              <View style={styles.commentsPhoto}>
-                <Image source={require("./images/message-circle.png")} />
-                <Text style={styles.commentNumber}>500</Text>
-              </View>
-              <View style={styles.likesPhoto}>
-                <Image source={require("./images/thumbs-up.png")} />
-                <Text style={styles.likesNumber}>200</Text>
-              </View>
-              <View style={styles.locationPhoto}>
-                <SimpleLineIcons
-                  name="location-pin"
-                  size={15}
-                  color="#BDBDBD"
-                />
-                <Pressable onPress={() => navigation.navigate("MapScreen")}>
-                  <Text style={styles.location}>Italy</Text>
-                </Pressable>
-              </View>
-            </View>
-          </ScrollView>
+          {posts && (
+            <ScrollView>
+              {posts.map((post, index) => (
+                <View key={index} style={styles.postContainer}>
+                  <View style={styles.post}>
+                    <Image
+                      source={{ uri: post.uriPhoto }}
+                      style={styles.photo}
+                    />
+                  </View>
+                  <Text style={styles.namePhoto}>{post.namePhoto}</Text>
+                  <View style={styles.commentsContainer}>
+                    <View style={styles.commentsPhoto}>
+                      <Pressable
+                        onPress={() =>
+                          navigation.navigate("CommentsScreen", {
+                            uriPhoto: post.uriPhoto,
+                            namePhoto: post.namePhoto,
+                            nameLocation: post.nameLocation,
+                          })
+                        }
+                      >
+                        <Image
+                          source={require("./images/message-circle-empty.png")}
+                        />
+                      </Pressable>
+
+                      <Text style={styles.commentNumber}>0</Text>
+                    </View>
+                    <View style={styles.locationPhoto}>
+                      <SimpleLineIcons
+                        name="location-pin"
+                        size={15}
+                        color="#BDBDBD"
+                      />
+                      <Pressable
+                        onPress={() => {
+                          navigation.navigate("MapScreen", {
+                            locationPhoto: post.currentLocation,
+                          });
+                        }}
+                      >
+                        <Text style={styles.location}>{post.nameLocation}</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          )}
         </View>
       </ImageBackground>
     </View>
@@ -161,13 +142,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 16,
     overflow: "hidden",
+    zIndex: 4,
   },
   addButton: {
     position: "absolute",
     width: 25,
     height: 25,
-    right: 129,
-    top: 15,
+    right: -7,
+    top: 74,
+    zIndex: 5,
   },
   logOutButton: {
     position: "absolute",
@@ -180,23 +163,35 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     borderRadius: 16,
+    zIndex: 3,
   },
-  photoContainer: {
+  post: {
     width: "100%",
     height: 240,
     backgroundColor: "#F6F6F6",
     marginLeft: "auto",
     marginRight: "auto",
+    justifyContent: "center",
+    alignItems: "center",
+    borderStyle: "solid",
+    borderColor: "#E8E8E8",
+    borderWidth: 1,
     borderRadius: 8,
     overflow: "hidden",
+    position: "relative",
   },
+  photo: {
+    width: "100%",
+    height: "100%",
+  },
+
   namePhoto: {
     marginRight: "auto",
     marginTop: 8,
     fontFamily: "Roboto-Medium",
     fontSize: 16,
   },
-  photoDetailsContainer: {
+  commentsContainer: {
     flexDirection: "row",
     width: "100%",
     alignItems: "center",
@@ -214,20 +209,10 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     fontSize: 16,
   },
-  likesPhoto: {
-    flexDirection: "row",
-    marginRight: "auto",
-    alignItems: "center",
-  },
-  likesNumber: {
-    marginLeft: 6,
-    color: "#212121",
-    fontFamily: "Roboto-Regular",
-    fontSize: 16,
-  },
   locationPhoto: {
     flexDirection: "row",
     alignItems: "center",
+    marginLeft: "auto",
   },
   location: {
     marginLeft: 4,

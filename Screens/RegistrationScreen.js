@@ -12,25 +12,29 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { registerAuthThunk } from "../redux/Auth/thunks";
+import { setUser } from "../redux/Auth/authSlice";
 
 export function RegistrationScreen() {
   const [name, setName] = useState("");
-  const [mail, setMail] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isFieldsEmpty, setIsFieldsEmpty] = useState(true);
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const dispatch = useDispatch();
 
   const navigation = useNavigation();
 
   const clearInputs = () => {
     setName("");
-    setMail("");
+    setEmail("");
     setPassword("");
   };
 
   const checkFieldsEmpty = () => {
-    if (name.trim() === "" || mail.trim() === "" || password.trim() === "") {
+    if (name.trim() === "" || email.trim() === "" || password.trim() === "") {
       setIsFieldsEmpty(true);
     } else {
       setIsFieldsEmpty(false);
@@ -42,10 +46,15 @@ export function RegistrationScreen() {
     setIsEmailValid(emailRegex.test(email));
   };
 
-  const onRegister = () => {
-    console.debug({ name, mail, password });
-    clearInputs();
-    navigation.navigate("Home");
+  const onRegister = async () => {
+    try {
+      await dispatch(registerAuthThunk({ name, email, password }));
+      dispatch(setUser({ email, userName: name }));
+      clearInputs();
+      navigation.navigate("Home");
+    } catch (error) {
+      throw error;
+    }
   };
 
   const toggleShowPassword = () => {
@@ -80,9 +89,9 @@ export function RegistrationScreen() {
               <TextInput
                 style={[styles.input, styles.secondaryInput]}
                 placeholder="Адреса електронної пошти"
-                value={mail}
+                value={email}
                 onChangeText={(text) => {
-                  setMail(text);
+                  setEmail(text);
                   validateEmail(text);
                 }}
                 onBlur={checkFieldsEmpty}

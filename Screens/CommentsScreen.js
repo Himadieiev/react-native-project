@@ -1,10 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { MaterialIcons, SimpleLineIcons, Feather } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { ScrollView } from "react-native-gesture-handler";
 
 export function CommentsScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const uriPhoto = route.params?.uriPhoto || null;
 
   const back = () => {
     navigation.navigate("PostsScreen");
@@ -18,6 +21,19 @@ export function CommentsScreen() {
         </Pressable>
         <Text style={styles.title}>Коментарі</Text>
       </View>
+      {uriPhoto && (
+        <ScrollView>
+          <View style={styles.postContainer}>
+            <View style={styles.post}>
+              <Image source={{ uri: uriPhoto }} style={styles.photo} />
+            </View>
+          </View>
+          <View style={styles.commentContainer}>
+            <Text style={styles.commentText}></Text>
+            <Text style={styles.commentDate}></Text>
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -50,4 +66,31 @@ const styles = StyleSheet.create({
     left: 16,
     top: 54,
   },
+  post: {
+    width: "100%",
+    height: 240,
+    backgroundColor: "#F6F6F6",
+    marginLeft: "auto",
+    marginRight: "auto",
+    justifyContent: "center",
+    alignItems: "center",
+    borderStyle: "solid",
+    borderColor: "#E8E8E8",
+    borderWidth: 1,
+    borderRadius: 8,
+    overflow: "hidden",
+    position: "relative",
+  },
+  photo: {
+    width: "100%",
+    height: "100%",
+  },
+  postContainer: {
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 32,
+  },
+  commentContainer: {},
+  commentText: {},
+  commentDate: {},
 });
