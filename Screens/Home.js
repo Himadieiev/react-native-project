@@ -2,27 +2,14 @@ import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, Feather } from "@expo/vector-icons";
-import {
-  getFocusedRouteNameFromRoute,
-  useNavigation,
-} from "@react-navigation/native";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { PostsScreen } from "./PostsScreen";
 import { CreatePostsScreen } from "./CreatePostsScreen";
 import { ProfileScreen } from "./ProfileScreen";
-import { useSelector } from "react-redux";
 
 const Tabs = createBottomTabNavigator();
 
 export function Home() {
-  const navigation = useNavigation();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigation.navigate("LoginScreen");
-    }
-  }, [isLoggedIn, navigation]);
-
   return (
     <Tabs.Navigator
       screenOptions={({ route }) => ({

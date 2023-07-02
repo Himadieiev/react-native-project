@@ -11,9 +11,11 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { logInAuthThunk } from "../redux/Auth/thunks";
 import { setUser } from "../redux/Auth/authSlice";
+import { auth } from "../firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
 
 export function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -23,13 +25,18 @@ export function LoginScreen() {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      navigation.navigate("Home");
-    }
-  }, [isLoggedIn, navigation]);
+    onAuthStateChanged(auth, async (token) => {
+      if (token) {
+        console.log("Користувач log in!", token.uid);
+        navigation.navigate("Home");
+      } else {
+        console.log("Користувач log out!");
+        navigation.navigate("LoginScreen");
+      }
+    });
+  }, []);
 
   const clearInputs = () => {
     setEmail("");
