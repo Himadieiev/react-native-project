@@ -15,9 +15,9 @@ import { authReducer } from "./Auth/authSlice";
 import { createLogger } from "redux-logger";
 
 const persistConfig = {
-  key: "user",
+  key: "auth",
   storage: AsyncStorage,
-  whitelist: ["auth"],
+  whitelist: ["token"],
 };
 
 const logger = createLogger();

@@ -1,18 +1,10 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
 import { useFonts } from "expo-font";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { LoginScreen } from "./Screens/LoginScreen";
-import { RegistrationScreen } from "./Screens/RegistrationScreen";
-import { MapScreen } from "./Screens/MapScreen";
-import { CommentsScreen } from "./Screens/CommentsScreen";
-import { Home } from "./Screens/Home";
 import { Provider } from "react-redux";
 import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
-
-const MainStack = createStackNavigator();
+import Navigation from "./components/Navigation";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -29,35 +21,7 @@ export default function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <View style={styles.container}>
-          <NavigationContainer>
-            <MainStack.Navigator initialRouteName="LoginScreen">
-              <MainStack.Screen
-                name="RegistrationScreen"
-                component={RegistrationScreen}
-                options={{ headerShown: false }}
-              />
-              <MainStack.Screen
-                name="LoginScreen"
-                component={LoginScreen}
-                options={{ headerShown: false }}
-              />
-              <MainStack.Screen
-                name="Home"
-                component={Home}
-                options={{ headerShown: false }}
-              />
-              <MainStack.Screen
-                name="MapScreen"
-                component={MapScreen}
-                options={{ headerShown: false }}
-              />
-              <MainStack.Screen
-                name="CommentsScreen"
-                component={CommentsScreen}
-                options={{ headerShown: false }}
-              />
-            </MainStack.Navigator>
-          </NavigationContainer>
+          <Navigation style={styles.container} />
           <StatusBar style="auto" />
         </View>
       </PersistGate>
