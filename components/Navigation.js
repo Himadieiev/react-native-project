@@ -11,8 +11,8 @@ import { useSelector } from "react-redux";
 const MainStack = createStackNavigator();
 
 export default function Navigation() {
-  const { token } = useSelector((state) => state.auth);
-  const initialRoute = token ? "Home" : "LoginScreen";
+  const { email } = useSelector((state) => state.auth);
+  const initialRoute = email ? "Home" : "LoginScreen";
 
   return (
     <View style={styles.container}>

@@ -17,7 +17,7 @@ import { createLogger } from "redux-logger";
 const persistConfig = {
   key: "auth",
   storage: AsyncStorage,
-  whitelist: ["token"],
+  whitelist: ["token", "email"],
 };
 
 const logger = createLogger();
