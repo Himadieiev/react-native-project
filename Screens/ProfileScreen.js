@@ -5,10 +5,10 @@ import {
   View,
   Image,
   Pressable,
+  ScrollView,
 } from "react-native";
-import { MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
+import { MaterialIcons, SimpleLineIcons, AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getPostsThunk } from "../redux/Posts/thunks";
@@ -39,7 +39,7 @@ export function ProfileScreen() {
         <View style={styles.contentContainer}>
           <View style={styles.avatarContainer}>
             <ImageBackground
-              source={require("./images/avatar.jpg")}
+              source={require("./images/avatar.png")}
               style={styles.avatarImage}
             ></ImageBackground>
             <Pressable style={styles.addButton}>
@@ -52,9 +52,9 @@ export function ProfileScreen() {
             <MaterialIcons name="logout" size={24} color="#BDBDBD" />
           </Pressable>
           {posts && (
-            <ScrollView>
+            <ScrollView style={styles.postContainer}>
               {posts.map((post, index) => (
-                <View key={index} style={styles.postContainer}>
+                <View key={index}>
                   <View style={styles.post}>
                     <Image
                       source={{ uri: post.uriPhoto }}
@@ -67,6 +67,7 @@ export function ProfileScreen() {
                       <Pressable
                         onPress={() =>
                           navigation.navigate("CommentsScreen", {
+                            postId: post.id,
                             uriPhoto: post.uriPhoto,
                             namePhoto: post.namePhoto,
                             nameLocation: post.nameLocation,
@@ -74,11 +75,18 @@ export function ProfileScreen() {
                         }
                       >
                         <Image
-                          source={require("./images/message-circle-empty.png")}
+                          source={require("./images/message-circle.png")}
                         />
                       </Pressable>
 
                       <Text style={styles.commentNumber}>0</Text>
+                    </View>
+                    <View style={styles.likesPhoto}>
+                      <Pressable>
+                        <AntDesign name="like2" size={24} color="#FF6C00" />
+                      </Pressable>
+
+                      <Text style={styles.likesNumber}>0</Text>
                     </View>
                     <View style={styles.locationPhoto}>
                       <SimpleLineIcons
@@ -133,6 +141,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     marginTop: 147,
+    height: "100%",
   },
   avatarContainer: {
     position: "absolute",
@@ -141,8 +150,6 @@ const styles = StyleSheet.create({
     height: 120,
     backgroundColor: "#F6F6F6",
     borderRadius: 16,
-    overflow: "hidden",
-    zIndex: 4,
   },
   addButton: {
     position: "absolute",
@@ -184,7 +191,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-
   namePhoto: {
     marginRight: "auto",
     marginTop: 8,
@@ -209,6 +215,17 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto-Regular",
     fontSize: 16,
   },
+  likesPhoto: {
+    flexDirection: "row",
+    marginRight: 24,
+    alignItems: "center",
+  },
+  likesNumber: {
+    marginLeft: 6,
+    color: "#212121",
+    fontFamily: "Roboto-Regular",
+    fontSize: 16,
+  },
   locationPhoto: {
     flexDirection: "row",
     alignItems: "center",
@@ -220,5 +237,8 @@ const styles = StyleSheet.create({
     color: "#212121",
     fontFamily: "Roboto-Regular",
     fontSize: 16,
+  },
+  postContainer: {
+    marginBottom: 100,
   },
 });

@@ -5,7 +5,7 @@ import {
   deletePostThunk,
   getPostsThunk,
   createLike,
-  createComment,
+  createCommentThunk,
 } from "./thunks";
 
 export const postsSlice = createSlice({
@@ -52,6 +52,25 @@ export const postsSlice = createSlice({
         state.posts = action.payload;
       })
       .addCase(getPostsThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      })
+      .addCase(createCommentThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createCommentThunk.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        const postIdToUpdate = action.payload.postId;
+        const postToUpdate = state.posts.find(
+          (post) => post.id === postIdToUpdate
+        );
+        if (postToUpdate) {
+          postToUpdate.comments.push(action.payload);
+        }
+      })
+      .addCase(createCommentThunk.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message;
       });

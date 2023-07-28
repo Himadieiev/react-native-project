@@ -1,9 +1,14 @@
 import React, { useEffect } from "react";
-import { Pressable } from "react-native";
-import { View, Text, StyleSheet, Image } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  Image,
+} from "react-native";
 import { MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { ScrollView } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { createPostThunk, getPostsThunk } from "../redux/Posts/thunks";
 import { logOutAuthThunk } from "../redux/Auth/thunks";
@@ -30,7 +35,9 @@ export function PostsScreen() {
         namePhoto,
         nameLocation,
         currentLocation,
+        comments: [],
       };
+
       dispatch(createPostThunk(newPost));
     }
   }, [uriPhoto]);
@@ -66,7 +73,7 @@ export function PostsScreen() {
       </View>
       <View style={styles.content}>
         <Image
-          source={require("./images/avatar-small.jpg")}
+          source={require("./images/avatar-small.png")}
           style={styles.avatar}
         />
         <View>
@@ -87,6 +94,7 @@ export function PostsScreen() {
                   <Pressable
                     onPress={() =>
                       navigation.navigate("CommentsScreen", {
+                        postId: post.id,
                         uriPhoto: post.uriPhoto,
                         namePhoto: post.namePhoto,
                         nameLocation: post.nameLocation,
@@ -130,7 +138,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
-
   header: {
     flexDirection: "row",
     height: 88,
@@ -140,14 +147,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: " #E5E5E5",
   },
-
   title: {
     fontFamily: "Roboto-Medium",
     fontSize: 17,
     marginLeft: 140,
     marginRight: "auto",
   },
-
   content: {
     flexDirection: "row",
     alignItems: "center",
@@ -155,23 +160,19 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginBottom: 32,
   },
-
   avatar: {
     marginRight: 8,
   },
-
   nameUser: {
     fontFamily: "Roboto-Bold",
     fontSize: 13,
     lineHeight: 15.23,
   },
-
   emailUser: {
     fontFamily: "Roboto-Regular",
     fontSize: 11,
     lineHeight: 12.89,
   },
-
   post: {
     width: "100%",
     height: 240,
@@ -184,7 +185,6 @@ const styles = StyleSheet.create({
     borderColor: "#E8E8E8",
     borderWidth: 1,
     borderRadius: 8,
-    overflow: "hidden",
     position: "relative",
   },
   photo: {

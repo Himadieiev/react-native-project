@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { useRoute } from "@react-navigation/native";
@@ -13,8 +13,6 @@ export function MapScreen() {
     latitude: 50.4501,
     longitude: 30.5234,
   };
-
-  console.log(locationPhoto);
 
   useEffect(() => {
     (async () => {

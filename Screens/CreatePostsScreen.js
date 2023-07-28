@@ -51,7 +51,7 @@ export function CreatePostsScreen() {
   }
 
   const back = () => {
-    navigation.navigate("PostsScreen");
+    navigation.goBack();
   };
 
   const clearInputs = () => {

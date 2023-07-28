@@ -200,11 +200,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   disabledButton: {
     opacity: 0.5,
   },
-
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,
